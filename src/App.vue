@@ -4,7 +4,8 @@ import TheWelcome from './components/TheWelcome.vue'
 
 // Import the functions you need from the SDKs you need
 import { initializeApp } from 'firebase/app'
-import { getAnalytics } from 'firebase/analytics'
+//import { getAnalytics } from 'firebase/analytics'
+import { getAI, getGenerativeModel, GoogleAIBackend } from 'firebase/ai'
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -23,7 +24,28 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig)
-const analytics = getAnalytics(app)
+//const analytics = getAnalytics(app)
+
+// Initialize the Gemini Developer API backend service
+const ai = getAI(app, { backend: new GoogleAIBackend() })
+
+// Create a `GenerativeModel` instance with a model that supports your use case
+const model = getGenerativeModel(ai, { model: 'gemini-2.5-flash' })
+
+// Wrap in an async function so you can use await
+async function run() {
+  // Provide a prompt that contains text
+  const prompt = 'Write a story about a magic backpack.'
+
+  // To generate text output, call generateContent with the text input
+  const result = await model.generateContent(prompt)
+
+  const response = result.response
+  const text = response.text()
+  console.log(text)
+}
+
+run()
 </script>
 
 <template>
