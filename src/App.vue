@@ -12,7 +12,7 @@ import { getAI, getGenerativeModel, GoogleAIBackend } from 'firebase/ai'
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: 'AIzaSyADj2B2tgbg8jJjyPcpCSdLgxLEyExIC_0',
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
   authDomain: 'godot4-gamemaker-assistant.firebaseapp.com',
   projectId: 'godot4-gamemaker-assistant',
   storageBucket: 'godot4-gamemaker-assistant.firebasestorage.app',
@@ -53,7 +53,7 @@ run()
     <img alt="Vue logo" class="logo" src="./assets/logo.svg" width="125" height="125" />
 
     <div class="wrapper">
-      <HelloWorld msg="You did it!" />
+      <HelloWorld msg="You " />
     </div>
   </header>
 
