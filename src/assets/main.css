@@ -28,8 +28,8 @@ a,
     height: 100vh; /* full height of viewport */
     display: flex;
     justify-content: center; /* center horizontally */
-    align-items: center;     /* center vertically */
-    background-color: #12121a;
+       /* center vertically */
+    background-color: #191925;
   }
 
 }

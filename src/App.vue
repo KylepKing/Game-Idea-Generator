@@ -2,7 +2,7 @@
 
 import { ref, computed } from 'vue'
 import { model } from './firebase.ts'
-
+import { marked } from 'marked'
 
 // Dropdown options
 const mediums = ['2D', '3D', 'Text-Based']
@@ -51,10 +51,11 @@ Generate a unique and fun video game idea using these inputs:
 - Theme: ${selectedTheme.value}
 
 Include:
-- A core gameplay mechanic
+- A core gameplay loop (including main mechanic and basics of how that system works)
 - A short story/setting
 - Art style
 - Optional characters or power-ups
+-At the end provice a short list of steps to take to start building the game. Do not include any code just an outline of steps.
 
 Keep it concise but imaginative.
 `.trim()
@@ -136,13 +137,10 @@ const previewText = computed(() =>
     🔄 Reset
   </button>
 </div>
-
-
 <div v-if="responseText" class="response-box">
   <h2>Response:</h2>
   <div @click="toggleExpanded" class="response-toggle">
-    <div class="response-preview">
-      <pre>{{ expanded ? responseText : previewText }}</pre>
+    <div class="response-preview" v-html="marked( expanded ? responseText : previewText )">
     </div>
     <span class="dropdown-arrow">{{ expanded ? '▲ Show Less' : '▼ Show More' }}</span>
   </div>
@@ -155,7 +153,8 @@ const previewText = computed(() =>
 .header {
   text-align: center;
   margin-bottom: 2rem;
-  color : #93c5fd;
+  color : #51a2ff;
+  font-style: oblique;
 }
 
 .button-container {
@@ -216,7 +215,7 @@ button:hover {
 .response-box h2 {
   margin-bottom: 1rem;
   font-size: 1.25rem;
-  color: #93c5fd;
+  color: #51a2ff;
 }
 
 .response-box pre {
