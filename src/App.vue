@@ -1,92 +1,121 @@
 <script setup lang="ts">
-import HelloWorld from './components/HelloWorld.vue'
-import TheWelcome from './components/TheWelcome.vue'
 
-// Import the functions you need from the SDKs you need
-import { initializeApp } from 'firebase/app'
-//import { getAnalytics } from 'firebase/analytics'
-import { getAI, getGenerativeModel, GoogleAIBackend } from 'firebase/ai'
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
+import { ref } from 'vue'
+import { model } from './firebase.ts'
 
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain: 'godot4-gamemaker-assistant.firebaseapp.com',
-  projectId: 'godot4-gamemaker-assistant',
-  storageBucket: 'godot4-gamemaker-assistant.firebasestorage.app',
-  messagingSenderId: '705783289749',
-  appId: '1:705783289749:web:36e59d03d1e9c54eccc89c',
-  measurementId: 'G-P5Z0WYFZWQ',
-}
-// test
+//userQuestion stores what the user types in the box
+const userQuestion = ref('')
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig)
-//const analytics = getAnalytics(app)
+//responseText stores what Gemini sends back
+const responseText = ref('')
 
-// Initialize the Gemini Developer API backend service
-const ai = getAI(app, { backend: new GoogleAIBackend() })
+const loading = ref(false)
 
-// Create a `GenerativeModel` instance with a model that supports your use case
-const model = getGenerativeModel(ai, { model: 'gemini-2.5-flash' })
 
 // Wrap in an async function so you can use await
-async function run() {
-  // Provide a prompt that contains text
-  const prompt = 'Write a story about a magic backpack.'
+async function submitQuestion() {
+  if (!userQuestion.value.trim()) return
 
-  // To generate text output, call generateContent with the text input
-  const result = await model.generateContent(prompt)
+  loading.value = true
+  responseText.value = ''
 
-  const response = result.response
-  const text = response.text()
-  console.log(text)
+  try {
+    const result = await model.generateContent(userQuestion.value)
+    const text = result.response.text()
+    responseText.value = text
+  } catch (error) {
+    responseText.value = 'Something went wrong. Check the console.'
+    console.error('Gemini error:', error)
+  } finally {
+    loading.value = false
+  }
 }
 
-run()
+//run()
 </script>
 
 <template>
-  <header>
-    <img alt="Vue logo" class="logo" src="./assets/logo.svg" width="125" height="125" />
+  <div class="godot-icon">
+    <img src="@/assets/godoticon.svg" alt="Godot Icon" />
+  </div>
+  <div class="app-container">
+    <h1>Godot 4 Game Dev Assistant</h1>
 
-    <div class="wrapper">
-      <HelloWorld msg="You " />
+    <div class="question-box">
+      <textarea
+        v-model="userQuestion"
+        placeholder="Ask a question about Godot 4 game development..."
+        rows="4"
+      ></textarea>
+
+      <button @click="submitQuestion" :disabled="loading">Ask Gemini {{ loading ? 'Thinking...' : ''}}</button>
     </div>
-  </header>
 
-  <main>
-    <TheWelcome />
-  </main>
+    <div v-if="responseText" class="response-box">
+      <h2>Response:</h2>
+      <p>{{ responseText }}</p>
+    </div>
+  </div>
 </template>
 
 <style scoped>
-header {
-  line-height: 1.5;
+
+.godot-icon {
+  justify-self: center;
+  scale: 1.5;
 }
 
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
+.app-container {
+  max-width: 700px;
+  margin: 3rem auto;
+  padding: 2rem;
+  border-radius: 12px;
+  background: #1e1e2f;
+  color: white;
+  font-family: sans-serif;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
 }
 
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
-  }
+h1 {
+  text-align: center;
+  margin-bottom: 2rem;
+}
 
-  .logo {
-    margin: 0 2rem 0 0;
-  }
+.question-box {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
 
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
+textarea {
+  width: 100%;
+  padding:1rem;
+  font-size: 1rem;
+  border-radius: 8px;
+  border: none;
+  resize: vertical;
+}
+
+button {
+  padding: 0.8rem 1.5rem;
+  background-color: #4f46e5;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  align-self: flex-start;
+  transition: background-color 0.2s;
+}
+
+button:hover {
+  background-color: #3730a3;
+}
+
+.response-box {
+  margin-top: 2rem;
+  background: #2d2d44;
+  padding: 1rem;
+  border-radius: 8px;
 }
 </style>
